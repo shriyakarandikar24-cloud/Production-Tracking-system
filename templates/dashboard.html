@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+<section class="cards">
+    <article class="stat-card"><span>Total Projects</span><strong>{{ counts.projects if counts.projects is not none else '—' }}</strong></article>
+    <article class="stat-card"><span>In Progress</span><strong>{{ counts.in_progress if counts.in_progress is not none else '—' }}</strong></article>
+    <article class="stat-card"><span>On Hold</span><strong>{{ counts.on_hold if counts.on_hold is not none else '—' }}</strong></article>
+</section>
+
+<section class="panel">
+    <div class="panel-head">
+        <h2>Projects</h2>
+        <a href="{{ url_for('projects') }}">Open project list</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Project No.</th>
+                    <th>Project</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td><a href="{{ url_for('project_detail', project_id=row.project_id) }}">{{ row.project_no }}</a></td>
+                    <td>{{ row.project_name }}</td>
+                    <td>{{ row.customer_name }}</td>
+                    <td><span class="badge {{ row.project_status|replace(' ', '-')|lower }}">{{ row.project_status }}</span></td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4">No projects found in the database.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Quality{% endblock %}
+{% block heading %}Quality inspections{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="panel-head">
+        <h2>Record inspection</h2>
+        <p>Inserts into existing <code>quality_inspections</code>.</p>
+    </div>
+    <form method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Project *
+            <select name="project_id" required>
+                <option value="">Select project</option>
+                {% for p in projects %}
+                <option value="{{ p.project_id }}">{{ p.project_no }} — {{ p.project_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Inspection date *
+            <input type="date" name="inspection_date" value="{{ today }}" required>
+        </label>
+        <label>Inspected by
+            <select name="inspected_by">
+                <option value="">—</option>
+                {% for e in employees %}
+                <option value="{{ e.employee_id }}">{{ e.employee_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Result
+            <select name="result">
+                {% for r in inspection_results %}
+                <option value="{{ r }}">{{ r }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Qty inspected
+            <input type="number" min="0" name="quantity_inspected" value="0">
+        </label>
+        <label>Qty passed
+            <input type="number" min="0" name="quantity_passed" value="0">
+        </label>
+        <label>Qty rejected
+            <input type="number" min="0" name="quantity_rejected" value="0">
+        </label>
+        <label class="span-2">Defect notes
+            <input name="defect_notes">
+        </label>
+        <div class="form-actions span-2">
+            <button type="submit" class="btn primary">Save inspection</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Inspection records</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th><th>Project</th><th>By</th><th>Inspected</th>
+                    <th>Passed</th><th>Rejected</th><th>Result</th><th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row.inspection_date|fmt_date }}</td>
+                    <td><a href="{{ url_for('project_detail', project_id=row.project_id) }}">{{ row.project_no }}</a> {{ row.project_name }}</td>
+                    <td>{{ row.employee_name or '—' }}</td>
+                    <td>{{ row.quantity_inspected }}</td>
+                    <td>{{ row.quantity_passed }}</td>
+                    <td>{{ row.quantity_rejected }}</td>
+                    <td>{{ row.result }}</td>
+                    <td>{{ row.defect_notes or '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8">No quality inspection records.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="panel-head">
+        <h2>Pending inspection alerts</h2>
+        <p>From view <code>vw_pending_inspections</code></p>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Project No.</th><th>Project</th><th>Customer</th><th>Inspection date</th><th>Status</th><th>Alert</th></tr>
+            </thead>
+            <tbody>
+                {% for row in pending %}
+                <tr>
+                    <td>{{ row.project_no }}</td>
+                    <td>{{ row.project_name }}</td>
+                    <td>{{ row.customer_name }}</td>
+                    <td>{{ row.inspection_date|fmt_date }}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.inspection_alert }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6">No pending inspection alerts.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Account{% endblock %}
+{% block heading %}Account{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="panel-head">
+        <h2>Change password</h2>
+        <p>Signed in as {{ current_user }} ({{ current_role }}). The new password is stored as a hash.</p>
+    </div>
+    <form method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Current password
+            <input type="password" name="current_password" required>
+        </label>
+        <label>New password
+            <input type="password" name="new_password" required minlength="8">
+        </label>
+        <div class="form-actions span-2">
+            <button type="submit" class="btn primary">Update password</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

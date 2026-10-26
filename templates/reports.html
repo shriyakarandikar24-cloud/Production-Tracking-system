@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block heading %}Reports{% endblock %}
+{% block content %}
+<section class="export-row">
+    <a class="btn" href="{{ url_for('export_projects') }}">Export projects CSV</a>
+    <a class="btn" href="{{ url_for('export_updates') }}">Export updates CSV</a>
+    <a class="btn" href="{{ url_for('export_inspections') }}">Export inspections CSV</a>
+</section>
+
+<section class="panel">
+    <h2>Projects by status</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Status</th><th>Count</th></tr></thead>
+            <tbody>
+                {% for row in by_status %}
+                <tr><td>{{ row.current_status }}</td><td>{{ row.project_count }}</td></tr>
+                {% else %}
+                <tr><td colspan="2">No project counts returned.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel">
+    <h2>Latest project status</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Project No.</th><th>Project</th><th>Customer</th><th>Status</th>
+                    <th>Update date</th><th>Task</th><th>Qty completed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in latest %}
+                <tr>
+                    <td><a href="{{ url_for('project_detail', project_id=row.project_id) }}">{{ row.project_no }}</a></td>
+                    <td>{{ row.project_name }}</td>
+                    <td>{{ row.customer_name }}</td>
+                    <td>{{ row.project_status }}</td>
+                    <td>{{ row.update_date|fmt_date }}</td>
+                    <td>{{ row.todays_task or '—' }}</td>
+                    <td>{{ row.quantity_completed if row.quantity_completed is not none else '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7">No rows in vw_project_status.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="split">
+    <section class="panel">
+        <h2>Pending inspections</h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Project</th><th>Date</th><th>Alert</th></tr></thead>
+                <tbody>
+                    {% for row in pending %}
+                    <tr>
+                        <td>{{ row.project_no }} — {{ row.project_name }}</td>
+                        <td>{{ row.inspection_date|fmt_date }}</td>
+                        <td>{{ row.inspection_alert }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3">No pending inspections.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section class="panel">
+        <h2>Status history</h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>When</th><th>Project</th><th>From</th><th>To</th></tr></thead>
+                <tbody>
+                    {% for row in history %}
+                    <tr>
+                        <td>{{ row.changed_at|fmt_date }}</td>
+                        <td>{{ row.project_no }}</td>
+                        <td>{{ row.old_status or '—' }}</td>
+                        <td>{{ row.new_status }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4">No status history.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</section>
+{% endblock %}

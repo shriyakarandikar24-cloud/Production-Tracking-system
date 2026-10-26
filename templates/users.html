@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block heading %}Users{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="panel-head">
+        <h2>Add website user</h2>
+        <p>Passwords are hashed before they are stored in <code>app_users</code>.</p>
+    </div>
+    <form method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Username *
+            <input name="username" required maxlength="60">
+        </label>
+        <label>Password *
+            <input type="password" name="password" required minlength="8">
+        </label>
+        <label>Role *
+            <select name="role">
+                <option value="Employee">Employee</option>
+                <option value="Administrator">Administrator</option>
+            </select>
+        </label>
+        <div class="form-actions">
+            <button type="submit" class="btn primary">Save user</button>
+        </div>
+    </form>
+</section>
+<section class="panel">
+    <h2>Accounts</h2>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Username</th><th>Role</th><th>Created</th></tr></thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row.username }}</td>
+                    <td>{{ row.role }}</td>
+                    <td>{{ row.created_at|fmt_date }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3">No website users found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Manpower{% endblock %}
+{% block heading %}Manpower allocation{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="panel-head">
+        <h2>Assign employee to project</h2>
+        <p>Inserts into existing <code>project_manpower</code>.</p>
+    </div>
+    <form method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Project *
+            <select name="project_id" required>
+                <option value="">Select project</option>
+                {% for p in projects %}
+                <option value="{{ p.project_id }}">{{ p.project_no }} — {{ p.project_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Employee *
+            <select name="employee_id" required>
+                <option value="">Select employee</option>
+                {% for e in employees %}
+                <option value="{{ e.employee_id }}">{{ e.employee_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Assigned date *
+            <input type="date" name="assigned_date" value="{{ today }}" required>
+        </label>
+        <label>Role
+            <input name="assignment_role" value="Production">
+        </label>
+        <div class="form-actions span-2">
+            <button type="submit" class="btn primary">Assign manpower</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <div class="panel-head">
+        <h2>Current manpower by project</h2>
+        <p>From view <code>vw_manpower_by_project</code></p>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Project No.</th><th>Project</th><th>Count</th><th>Employees</th></tr>
+            </thead>
+            <tbody>
+                {% for row in by_project %}
+                <tr>
+                    <td><a href="{{ url_for('project_detail', project_id=row.project_id) }}">{{ row.project_no }}</a></td>
+                    <td>{{ row.project_name }}</td>
+                    <td>{{ row.manpower_count }}</td>
+                    <td>{{ row.employees or '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4">No manpower rows returned.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="panel">
+    <h2>Assignment records</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Project</th><th>Employee</th><th>Department</th><th>Role</th><th>Assigned</th><th>Unassigned</th></tr>
+            </thead>
+            <tbody>
+                {% for row in assignments %}
+                <tr>
+                    <td>{{ row.project_no }} — {{ row.project_name }}</td>
+                    <td>{{ row.employee_name }}</td>
+                    <td>{{ row.department }}</td>
+                    <td>{{ row.assignment_role }}</td>
+                    <td>{{ row.assigned_date|fmt_date }}</td>
+                    <td>{{ row.unassigned_date|fmt_date }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6">No assignment records.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

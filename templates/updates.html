@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Daily updates{% endblock %}
+{% block heading %}Daily production update{% endblock %}
+{% block content %}
+<section class="panel">
+    <div class="panel-head">
+        <h2>Record today's work</h2>
+        <p>Saves through stored procedures <code>sp_add_production_update</code> and <code>sp_update_project_status</code>.</p>
+    </div>
+    <form method="post" class="form-grid">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Project *
+            <select name="project_id" required>
+                <option value="">Select project</option>
+                {% for p in projects %}
+                <option value="{{ p.project_id }}">{{ p.project_no }} — {{ p.project_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Update date *
+            <input type="date" name="update_date" value="{{ today }}" required>
+        </label>
+        <label class="span-2">Today's task *
+            <input name="todays_task" required>
+        </label>
+        <label class="span-2">Remarks
+            <input name="remarks">
+        </label>
+        <label>Status
+            <select name="status">
+                {% for s in statuses %}
+                <option value="{{ s }}" {% if s == 'In Progress' %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Inspection date
+            <input type="date" name="inspection_date">
+        </label>
+        <label>Planned qty
+            <input type="number" min="0" name="quantity_planned">
+        </label>
+        <label>Completed qty
+            <input type="number" min="0" name="quantity_completed" value="0">
+        </label>
+        <label>Updated by
+            <select name="updated_by">
+                <option value="">—</option>
+                {% for e in employees %}
+                <option value="{{ e.employee_id }}">{{ e.employee_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <div class="form-actions span-2">
+            <button type="submit" class="btn primary">Save update</button>
+        </div>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Production update history</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th><th>Project</th><th>Task</th><th>Status</th>
+                    <th>Planned</th><th>Completed</th><th>Inspection</th><th>By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>{{ row.update_date|fmt_date }}</td>
+                    <td><a href="{{ url_for('project_detail', project_id=row.project_id) }}">{{ row.project_no }}</a> {{ row.project_name }}</td>
+                    <td>{{ row.todays_task }}{% if row.remarks %}<div class="muted">{{ row.remarks }}</div>{% endif %}</td>
+                    <td>{{ row.status }}</td>
+                    <td>{{ row.quantity_planned if row.quantity_planned is not none else '—' }}</td>
+                    <td>{{ row.quantity_completed if row.quantity_completed is not none else '—' }}</td>
+                    <td>{{ row.inspection_date|fmt_date }}</td>
+                    <td>{{ row.employee_name or '—' }}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8">No production updates in the database.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
